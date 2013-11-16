@@ -8,9 +8,10 @@ import concurrency.stm.TransactionBlock;
  * @author mishadoff
  */
 public class STMStrategy implements TransferStrategy {
+	static int transactionCounter = 0;
     @Override
     public void transfer(final Account a, final Account b, final int amount) {
-        STM.transaction(new TransactionBlock() {
+        String trans = STM.<String>transaction(new TransactionBlock() {
             @Override
             public void run() {
                 Transaction tx = this.getTx();
@@ -19,6 +20,7 @@ public class STMStrategy implements TransferStrategy {
                 long old2 = b.getRef().getValue(tx);
                 b.getRef().setValue(old2 + amount, tx);
             }
-        });
+        }, "Transaction #" + transactionCounter++
+        );
     }
 }

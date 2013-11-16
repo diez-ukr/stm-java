@@ -2,17 +2,17 @@ package concurrency.stm;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author mishadoff
  */
-public final class Transaction extends Context{
+public final class Transaction<T> extends Context{
     private HashMap<Ref, Object> inTxMap = new HashMap<>();
     private HashSet<Ref> toUpdate = new HashSet<>();
     private HashMap<Ref, Long> version = new HashMap<>();
+	private Stack<T> value = new Stack<T>();
 
     private long revision;
     private static AtomicLong transactionNum = new AtomicLong(0);
@@ -20,6 +20,16 @@ public final class Transaction extends Context{
     Transaction() {
         revision = transactionNum.incrementAndGet();
     }
+
+	T getValue()
+	{
+		return this.value.lastElement();
+	}
+
+	void setValue(T value)
+	{
+		this.value.push(value);
+	}
 
     @Override
     <T> T get(Ref<T> ref) {
